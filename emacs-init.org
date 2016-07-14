@@ -1,0 +1,351 @@
+* Package repository settings
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-archives
+'( ("gnu" . "http://elpa.gnu.org/packages/")
+   ("melpa" . "http://melpa.milkbox.net/packages/")
+   ("elpy" . "https://jorgenschaefer.github.io/packages/")
+   ("org" . "http://orgmode.org/elpa/")))
+(package-initialize)
+#+END_SRC
+* Use-Package
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package)
+  )
+#+END_SRC
+* Keybindings
+** Open file in new window [C-x M-f]
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x M-f") 'ido-find-file-other-window)
+#+END_SRC
+** Switch buffers [C-TAB/C-S-TAB]
+#+BEGIN_SRC emacs-lisp
+(global-set-key [C-tab] 'other-window)
+(global-set-key [C-S-tab]
+    (lambda ()
+      (interactive)
+      (other-window -1)))
+#+END_SRC
+** Delete line [C-d]
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-d") 'kill-whole-line)
+#+END_SRC
+** Jump to start of code [C-a]
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-a") 'back-to-indentation)
+#+END_SRC
+* Org
+** Org mode open links and allow shift select
+#+BEGIN_SRC emacs-lisp
+(setq org-src-fontify-natively t
+      org-pretty-entities t
+      org-src-preserve-indentation t
+      org-src-window-setup 'current-window
+      org-edit-src-auto-save-idle-delay 60
+      org-return-follows-link t
+      org-support-shift-select t)
+#+END_SRC
+** Language support
+#+BEGIN_SRC emacs-lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((latex . t)
+   (python . t)
+   (gnuplot . t)
+   (sh . t)
+   (sql . t)))
+#+END_SRC
+* UI
+** Default directory
+#+BEGIN_SRC emacs-lisp
+(setq default-directory "~/")
+#+END_SRC
+** Disable startup screen
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-message t)
+#+END_SRC
+** Maximize window at startup
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+END_SRC
+** Disable toolbar
+#+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+#+END_SRC
+** Disable scrolling acceleration
+#+BEGIN_SRC emacs-lisp
+(setq mouse-wheel-progressive-speed nil)
+#+END_SRC
+** Shorten yes/no
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** Disable error sound
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+** Hide wrapped-line-arrow
+#+BEGIN_SRC emacs-lisp
+(global-visual-line-mode t)
+#+END_SRC
+** Display line numbers
+#+BEGIN_SRC emacs-lisp
+(global-linum-mode t)
+#+END_SRC
+** Font
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'default-frame-alist '(font . "Inconsolata 13"))
+#+END_SRC
+** Centered window
+#+BEGIN_SRC emacs-lisp
+(use-package centered-window-mode
+  :init
+  (defun cwm/center ()
+    (set-fringe-mode
+     (let ((right_fringe
+        (/ (- (frame-pixel-width)
+          (* 110 (frame-char-width)))
+           2)))
+       (cons (- right_fringe 50) right_fringe))
+     ))
+  :config
+  (centered-window-mode t)
+  :ensure t
+  :diminish centered-window-mode
+  )
+#+END_SRC
+** Adaptive wrap lines
+#+BEGIN_SRC emacs-lisp
+(use-package adaptive-wrap
+  :init
+  (define-globalized-minor-mode adaptive-wrap-global-mode
+    adaptive-wrap-prefix-mode
+    adaptive-wrap-prefix-mode)
+  :bind
+  :config
+  (adaptive-wrap-global-mode)
+  :ensure t
+  )
+#+END_SRC
+** Windmove. Navigate frames
+#+BEGIN_SRC emacs-lisp
+(use-package windmove
+  :config
+  (global-set-key (kbd "C-c <left>")  'windmove-left)
+  (global-set-key (kbd "C-c <right>") 'windmove-right)
+  (global-set-key (kbd "C-c <up>")    'windmove-up)
+  (global-set-key (kbd "C-c <down>")  'windmove-down)
+  :ensure t
+  )
+#+END_SRC
+** DIRED+. Extension to dired
+#+BEGIN_SRC emacs-lisp
+(use-package dired+
+  :ensure t
+  )
+#+END_SRC
+** IDO
+#+BEGIN_SRC emacs-lisp
+(use-package ido
+  :config
+  (ido-mode t)
+  :ensure t
+  )
+#+END_SRC
+** SMEX
+#+BEGIN_SRC emacs-lisp
+(use-package smex
+  :config
+  (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex)
+  :ensure t
+  )
+#+END_SRC
+** Theme
+#+BEGIN_SRC emacs-lisp
+(use-package monokai-theme
+  :ensure t
+  )
+#+END_SRC
+** Spaceline Modeline
+#+BEGIN_SRC emacs-lisp
+(use-package spaceline
+  :config
+  (require 'spaceline-config)
+  (spaceline-spacemacs-theme)
+  (custom-set-faces
+   '(spaceline-highlight-face ((t (:foreground "yellow" :background "red")))))
+  :ensure t
+  )
+#+END_SRC
+* Editing
+** Undo limit
+# Stop Emacs from losing undo information by
+# setting very high limits for undo buffers
+#+BEGIN_SRC emacs-lisp
+(setq undo-limit 20000000)
+(setq undo-strong-limit 40000000)
+#+END_SRC
+** Disable overwrite key
+#+BEGIN_SRC emacs-lisp
+(define-key global-map [(insert)] nil)
+#+END_SRC
+** Overwrite selected text
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode 1)
+#+END_SRC
+** Move lines with ALT
+#+BEGIN_SRC emacs-lisp
+(use-package drag-stuff
+  :config (drag-stuff-global-mode 1)
+  :ensure t
+  )
+#+END_SRC
+** Smartparens
+#+BEGIN_SRC emacs-lisp
+(use-package smartparens
+  :bind (:map smartparens-mode-map
+          ("C-M-<left>" . sp-backward-sexp)
+          ("C-M-<right>" . sp-forward-sexp)
+          ("C-S-<backspace>" . sp-backward-kill-sexp)
+          ("C-M-<down>" . sp-select-next-thing))
+  :init
+  (setq blink-matching-paren nil)
+  (require 'smartparens-config)
+  (set-face-attribute 'sp-show-pair-match-face nil :foreground "#CCCCCC" :background nil)
+  (set-face-attribute 'sp-show-pair-mismatch-face nil :foreground "red" :background nil)
+  :config
+  (smartparens-global-mode t)
+  (show-smartparens-global-mode t)
+  :ensure t
+  :diminish smartparens-mode
+  )
+#+END_SRC
+** Cursor
+#+BEGIN_SRC emacs-lisp
+(setq-default cursor-type 'box)
+(set-face-attribute 'region nil :background "turquoise")
+(set-cursor-color "orange")
+#+END_SRC
+* Functions
+** Open .emacs file
+#+BEGIN_SRC emacs-lisp
+(defvar dot_emacs_file_path (concat user-emacs-directory "emacs-init.org"))
+(defun dotemacsfile ()
+  (interactive)
+  (with-current-buffer (find-file dot_emacs_file_path))
+  )
+#+END_SRC
+* Programming
+** Highlight TODO/NOTE
+#+BEGIN_SRC emacs-lisp
+(setq fixme-modes '(rust-mode c++-mode emacs-lisp-mode))
+(make-face 'font-lock-fixme-face)
+(make-face 'font-lock-note-face)
+(mapc (lambda (mode)
+	(font-lock-add-keywords
+	 mode
+	 '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+	   ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+      fixme-modes)
+(modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
+(modify-face 'font-lock-note-face "Green" nil nil t nil t nil nil)
+#+END_SRC
+** Debugger
+#+BEGIN_SRC emacs-lisp
+(use-package realgud
+  :ensure t
+  )
+#+END_SRC
+** Magit. Version control
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :ensure t
+  )
+#+END_SRC
+** Flycheck. Error highlight
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck
+  :init
+  (global-flycheck-mode)
+  :ensure t
+  :config
+  )
+#+END_SRC
+** Company. Autocomplete
+#+BEGIN_SRC emacs-lisp
+(use-package company
+  :ensure t
+  :defer t
+  :init (add-hook 'after-init-hook 'global-company-mode)
+  :config
+  (setq company-idle-delay                0.1
+	company-minimum-prefix-length     2
+	company-tooltip-limit             20
+	company-tooltip-align-annotations t
+	)
+  (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+  )
+#+END_SRC
+** Rust
+*** Flycheck-Rust
+#+BEGIN_SRC emacs-lisp
+(when (package-installed-p 'flycheck)
+  (use-package flycheck-rust
+    :config
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+    :ensure t
+    )
+  )
+#+END_SRC
+*** Rust-Mode
+#+BEGIN_SRC emacs-lisp
+(use-package rust-mode
+  :ensure t
+  :config
+  ;; Cargo
+  (use-package cargo
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode)
+    :ensure t
+    )
+  
+  ;; Racer
+  (use-package racer
+    :config
+    (setq racer-cmd "~/.cargo/bin/racer")
+    (setq racer-rust-src-path "~/Applications/Rust stable source/src/")
+    (add-hook 'rust-mode-hook #'racer-mode)
+    (add-hook 'racer-mode-hook #'eldoc-mode)
+    (add-hook 'racer-mode-hook #'company-mode)
+    :ensure t
+    )
+  )
+#+END_SRC
+** C/C++
+# c++-mode rebinds C-d to c-electric-delete-forward. Rebind.
+(add-hook 'c++-mode-hook (lambda() (define-key c++-mode-map "\C-d" 'kill-whole-line)))
+** SR-Speedbar. Project browser for C
+#+BEGIN_SRC emacs-lisp
+(use-package sr-speedbar
+  :ensure t
+  )
+#+END_SRC
+*** Company-C
+#+BEGIN_SRC emacs-lisp
+(when (package-installed-p 'company)
+  (use-package company-c-headers
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-c-headers)
+    (add-to-list 'company-c-headers-path-system "/usr/include/c++/5.2.1")
+    )
+  )
+#+END_SRC
+* Autosettings
+#+BEGIN_SRC emacs-lisp
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+#+END_SRC
