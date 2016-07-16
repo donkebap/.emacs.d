@@ -242,7 +242,10 @@
 * Programming
 ** Highlight TODO/NOTE
 #+BEGIN_SRC emacs-lisp
-(setq fixme-modes '(rust-mode c++-mode emacs-lisp-mode))
+(setq fixme-modes '(rust-mode
+                    c++-mode
+                    c-mode
+                    emacs-lisp-mode))
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
 (mapc (lambda (mode)
@@ -254,19 +257,19 @@
 (modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "Green" nil nil t nil t nil nil)
 #+END_SRC
-** Debugger
+** Debugging
 #+BEGIN_SRC emacs-lisp
 (use-package realgud
   :ensure t
   )
 #+END_SRC
-** Magit. Version control
+** Version control
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :ensure t
   )
 #+END_SRC
-** Flycheck. Error highlight
+** Flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :init
@@ -275,7 +278,7 @@
   :config
   )
 #+END_SRC
-** Company. Autocomplete
+** Company. Autocompletion
 #+BEGIN_SRC emacs-lisp
 (use-package company
   :ensure t
@@ -289,6 +292,20 @@
 	)
   (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
   )
+#+END_SRC
+** Projectile
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :ensure t
+  :commands (projectile-global-mode projectile-ignored-projects projectile-compile-project)
+  :init (progn
+          (projectile-global-mode)        
+          (global-set-key (kbd "<f5>") 'projectile-compile-project))
+  :config (progn
+            (setq projectile-completion-system 'helm)
+            (setq projectile-switch-project-action 'helm-projectile)))
+
+  (global-set-key (kbd "<f6>") 'next-error)
 #+END_SRC
 ** Rust
 *** Flycheck-Rust
@@ -326,9 +343,25 @@
   )
 #+END_SRC
 ** C/C++
-# c++-mode rebinds C-d to c-electric-delete-forward. Rebind.
-(add-hook 'c++-mode-hook (lambda() (define-key c++-mode-map "\C-d" 'kill-whole-line)))
-** SR-Speedbar. Project browser for C
+*** Flycheck-pkg-config
+#+BEGIN_SRC emacs-lisp
+(when (package-installed-p 'flycheck)
+  (use-package flycheck-pkg-config
+    :ensure t))
+#+END_SRC
+*** Hooks
+#+BEGIN_SRC emacs-lisp
+(defun kill-line_kbd() 
+  (define-key c-mode-map "\C-d" 'kill-whole-line)
+  (define-key c-mode-map "\C-d" 'kill-whole-line))
+
+(defun c-hooks()
+  (kill-line_kbd))
+
+(add-hook 'c-mode-hook 'c-hooks)
+(add-hook 'c++-mode-hook 'c-hooks)
+#+END_SRC
+*** SR-Speedbar. Project browser for C
 #+BEGIN_SRC emacs-lisp
 (use-package sr-speedbar
   :ensure t
@@ -345,7 +378,7 @@
     )
   )
 #+END_SRC
-* Autosettings
+* Customizations
 #+BEGIN_SRC emacs-lisp
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 #+END_SRC
