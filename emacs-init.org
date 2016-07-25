@@ -73,7 +73,10 @@
 * UI
 ** Default directory
 #+BEGIN_SRC emacs-lisp
-(setq default-directory "~/")
+(if (eq system-type 'gnu/linux)
+  (setq default-directory "~/"))
+(if (eq system-type 'windows-nt)
+  (setq default-directory "%userprofile%"))
 #+END_SRC
 
 ** Disable startup screen
@@ -210,6 +213,36 @@
    '(spaceline-highlight-face ((t (:foreground "yellow" :background "red")))))
   :ensure t
   )
+#+END_SRC
+
+** ToggleWindowSplit [C-x |]
+#+BEGIN_SRC emacs-lisp
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+	     (next-win-buffer (window-buffer (next-window)))
+	     (this-win-edges (window-edges (selected-window)))
+	     (next-win-edges (window-edges (next-window)))
+	     (this-win-2nd (not (and (<= (car this-win-edges)
+					 (car next-win-edges))
+				     (<= (cadr this-win-edges)
+					 (cadr next-win-edges)))))
+	     (splitter
+	      (if (= (car this-win-edges)
+		     (car (window-edges (next-window))))
+		  'split-window-horizontally
+		'split-window-vertically)))
+	(delete-other-windows)
+	(let ((first-win (selected-window)))
+	  (funcall splitter)
+	  (if this-win-2nd (other-window 1))
+	  (set-window-buffer (selected-window) this-win-buffer)
+	  (set-window-buffer (next-window) next-win-buffer)
+	  (select-window first-win)
+	  (if this-win-2nd (other-window 1))))))
+
+(global-set-key (kbd "C-x |") 'toggle-window-split)
 #+END_SRC
 
 * Editing
@@ -408,8 +441,15 @@
   ;; Racer
   (use-package racer
     :config
-    (setq racer-cmd "~/.cargo/bin/racer")
-    (setq racer-rust-src-path "~/Applications/Rust stable source/src/")
+    (if (eq system-type 'gnu/linux)
+      (lambda()
+        (setq racer-cmd "~/.cargo/bin/racer")
+        (setq racer-rust-src-path "~/Applications/Rust stable source/src/")))
+    (if (eq system-type 'windows-nt)
+      (lambda()
+        (setq racer-cmd "~/.cargo/bin/racer")
+        (setq racer-rust-src-path "~/Applications/Rust stable source/src/")))
+
     (add-hook 'rust-mode-hook #'racer-mode)
     (add-hook 'racer-mode-hook #'eldoc-mode)
     (add-hook 'racer-mode-hook #'company-mode)
@@ -426,11 +466,18 @@
     :ensure t))
 #+END_SRC
 
+*** Flycheck C/C++ settings
+#+BEGIN_SRC emacs-lisp
+(defun flycheck_settings()
+  (setq flycheck-clang-language-standard "c++11"))
+(add-hook 'c++-mode-hook 'flycheck_settings)
+#+END_SRC
+
 *** Hooks
 #+BEGIN_SRC emacs-lisp
 (defun kill-line_kbd() 
   (define-key c-mode-map "\C-d" 'kill-whole-line)
-  (define-key c-mode-map "\C-d" 'kill-whole-line))
+  (define-key c++-mode-map "\C-d" 'kill-whole-line))
 
 (defun c-hooks()
   (kill-line_kbd))
@@ -453,9 +500,11 @@
     :ensure t
     :config
     (add-to-list 'company-backends 'company-c-headers)
-    (add-to-list 'company-c-headers-path-system "/usr/include/c++/5.2.1")
-    )
+    (if (eq system-type 'gnu/linux)
+      (lambda()
+        (add-to-list 'company-c-headers-path-system "/usr/include/c++/5.2.1")))
   )
+)
 #+END_SRC
 
 ** Webdev
