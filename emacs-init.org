@@ -20,7 +20,13 @@
 * Keybindings
 ** Open file in new window [C-x M-f]
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x M-f") 'ido-find-file-other-window)
+(defun open-file-in-new-vertical-split()
+  (interactive)
+  (select-window (split-window-right))
+  (ido-find-file)
+  )
+
+(global-set-key (kbd "C-x M-f") 'open-file-in-new-vertical-split)
 #+END_SRC
 
 ** Switch buffers [C-TAB/C-S-TAB]
@@ -42,9 +48,9 @@
 (global-set-key (kbd "C-a") 'back-to-indentation)
 #+END_SRC
 
-** Kill buffer and window [C-x C-k k]
+** Kill buffer and window [C-x C-k C-k]
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x C-k k") 'kill-buffer-and-window)
+(global-set-key (kbd "C-x C-k C-k") 'kill-buffer-and-window)
 #+END_SRC
 
 * Org
@@ -95,6 +101,10 @@
 (menu-bar-mode -1)
 #+END_SRC
 
+** Disable find-file auto-search
+#+BEGIN_SRC emacs-lisp
+(setq ido-auto-merge-work-directories-length -1)
+#+END_SRC
 ** Disable scrolling acceleration
 #+BEGIN_SRC emacs-lisp
 (setq mouse-wheel-progressive-speed nil)
