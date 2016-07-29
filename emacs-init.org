@@ -468,6 +468,29 @@
   )
 #+END_SRC
 
+*** Disassembly [C-c d]
+#+BEGIN_SRC emacs-lisp
+(use-package llvm-mode
+  :ensure t
+  )
+
+(defun rust-disassemble()
+  (interactive)
+  
+  (let ((dis_buffer (get-buffer-create "*rust-disassembly*")))
+    (let ((dis_window (get-buffer-window dis_buffer)))
+      (if (not dis_window)
+	  (setq dis_window (split-window-below)))
+      (set-window-buffer dis_window dis_buffer)
+      (shell-command (format "rustc -O --emit=obj %s -o %s.o" (buffer-name) (buffer-name)) dis_buffer dis_buffer)
+      (shell-command (format "objdump -dr %s.o" (buffer-name)) dis_buffer dis_buffer)
+      (select-window dis_window))
+    (with-current-buffer dis_buffer (llvm-mode)))
+  )
+
+(define-key rust-mode-map (kbd "C-c d") 'rust-disassemble)
+#+END_SRC
+
 ** C/C++
 *** Flycheck-pkg-config
 #+BEGIN_SRC emacs-lisp
