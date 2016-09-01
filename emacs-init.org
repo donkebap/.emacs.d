@@ -3,7 +3,8 @@
 (require 'package)
 (setq package-archives
 '( ("gnu" . "http://elpa.gnu.org/packages/")
-   ("melpa" . "http://melpa.milkbox.net/packages/")
+   ("melpa-stable" . "https://stable.melpa.org/packages/")
+   ("melpa" . "https://melpa.org/packages/")
    ("elpy" . "https://jorgenschaefer.github.io/packages/")
    ("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
@@ -11,10 +12,12 @@
 
 * Use-Package
 #+BEGIN_SRC emacs-lisp
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package)
   )
+(require 'use-package)
 #+END_SRC
 
 * Keybindings
@@ -132,7 +135,9 @@
 
 ** Font
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'default-frame-alist '(font . "Inconsolata 13"))
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono 13"))
+;(set-face-attribute 'default t :font "DejaVu Sans Mono-12")
+;(set-frame-font "DejaVu Sans Mono-11" nil t)
 #+END_SRC
 
 ** Centered window
@@ -371,9 +376,9 @@
 
 ** Debugging
 #+BEGIN_SRC emacs-lisp
-(use-package realgud
-  :ensure t
-  )
+;(use-package realgud
+;  :ensure t
+;  )
 #+END_SRC
 
 ** Version control
@@ -421,7 +426,7 @@
   (setq projectile-completion-system 'helm)
   (setq projectile-switch-project-action 'helm-projectile))
 
-  (global-set-key (kbd "<f6>") 'next-error)
+(global-set-key (kbd "<f6>") 'next-error)
 #+END_SRC
 
 ** Rust
@@ -440,31 +445,27 @@
 #+BEGIN_SRC emacs-lisp
 (use-package rust-mode
   :ensure t
+  )
+(use-package racer
   :config
-  ;; Cargo
-  (use-package cargo
-    :config
-    (add-hook 'rust-mode-hook 'cargo-minor-mode)
-    :ensure t
-    )
-  
-  ;; Racer
-  (use-package racer
-    :config
-    (if (eq system-type 'gnu/linux)
-      (lambda()
-        (setq racer-cmd "~/.cargo/bin/racer")
-        (setq racer-rust-src-path "~/Applications/Rust stable source/src/")))
-    (if (eq system-type 'windows-nt)
-      (lambda()
-        (setq racer-cmd "~/.cargo/bin/racer")
-        (setq racer-rust-src-path "~/Applications/Rust stable source/src/")))
+  (if (eq system-type 'gnu/linux)
+    (lambda()
+      (setq racer-cmd "~/.cargo/bin/racer")
+      (setq racer-rust-src-path "~/Applications/Rust_source/src/")))
+  (if (eq system-type 'windows-nt)
+    (lambda()
+      (setq racer-cmd "~/.cargo/bin/racer")
+      (setq racer-rust-src-path "~/Applications/Rust_source/src/")))
 
-    (add-hook 'rust-mode-hook #'racer-mode)
-    (add-hook 'racer-mode-hook #'eldoc-mode)
-    (add-hook 'racer-mode-hook #'company-mode)
-    :ensure t
-    )
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode)
+  (add-hook 'racer-mode-hook #'company-mode)
+  :ensure t
+  )
+(use-package cargo
+  :config
+  (add-hook 'rust-mode-hook 'cargo-minor-mode)
+  :ensure t
   )
 #+END_SRC
 

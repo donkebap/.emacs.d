@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (cargo magit smex monokai-theme use-package spaceline solarized-theme smartparens racer flycheck-rust drag-stuff dired+ company-racer centered-window-mode))))
+    (tide typescript-mode js2-mode web-mode company-c-headers sr-speedbar flycheck-pkg-config llvm-mode cargo racer rust-mode flycheck-rust projectile company flycheck magit smartparens drag-stuff undo-tree spaceline monokai-theme smex dired+ adaptive-wrap centered-window-mode use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
