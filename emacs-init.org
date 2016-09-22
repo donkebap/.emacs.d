@@ -3,7 +3,7 @@
 (require 'package)
 (setq package-archives
 '( ("gnu" . "http://elpa.gnu.org/packages/")
-   ("melpa-stable" . "https://stable.melpa.org/packages/")
+   ;("melpa-stable" . "https://stable.melpa.org/packages/")
    ("melpa" . "https://melpa.org/packages/")
    ("elpy" . "https://jorgenschaefer.github.io/packages/")
    ("org" . "http://orgmode.org/elpa/")))
@@ -374,13 +374,6 @@
 (modify-face 'font-lock-note-face "Green" nil nil t nil t nil nil)
 #+END_SRC
 
-** Debugging
-#+BEGIN_SRC emacs-lisp
-;(use-package realgud
-;  :ensure t
-;  )
-#+END_SRC
-
 ** Version control
 #+BEGIN_SRC emacs-lisp
 (use-package magit
@@ -388,6 +381,14 @@
   )
 #+END_SRC
 
+** Yasnippet
+#+BEGIN_SRC emacs-lisp
+;(use-package yasnippet
+;  :config
+;  (yas-global-mode 1)
+;  :ensure t
+;)
+#+END_SRC
 ** Flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
@@ -410,7 +411,7 @@
 	company-tooltip-limit             20
 	company-tooltip-align-annotations t
 	)
-  (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+  ;(global-set-key (kbd "TAB") #'company-indent-or-complete-common)
   )
 #+END_SRC
 
@@ -447,16 +448,14 @@
   :ensure t
   )
 (use-package racer
-  :config
+  :init
   (if (eq system-type 'gnu/linux)
-    (lambda()
       (setq racer-cmd "~/.cargo/bin/racer")
-      (setq racer-rust-src-path "~/Applications/Rust_source/src/")))
+      (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
   (if (eq system-type 'windows-nt)
-    (lambda()
       (setq racer-cmd "~/.cargo/bin/racer")
-      (setq racer-rust-src-path "~/Applications/Rust_source/src/")))
-
+      (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
+  :config
   (add-hook 'rust-mode-hook #'racer-mode)
   (add-hook 'racer-mode-hook #'eldoc-mode)
   (add-hook 'racer-mode-hook #'company-mode)
@@ -467,29 +466,6 @@
   (add-hook 'rust-mode-hook 'cargo-minor-mode)
   :ensure t
   )
-#+END_SRC
-
-*** Disassembly [C-c d]
-#+BEGIN_SRC emacs-lisp
-(use-package llvm-mode
-  :ensure t
-  )
-
-(defun rust-disassemble()
-  (interactive)
-  
-  (let ((dis_buffer (get-buffer-create "*rust-disassembly*")))
-    (let ((dis_window (get-buffer-window dis_buffer)))
-      (if (not dis_window)
-	  (setq dis_window (split-window-below)))
-      (set-window-buffer dis_window dis_buffer)
-      (shell-command (format "rustc -O --emit=obj %s -o %s.o" (buffer-name) (buffer-name)) dis_buffer dis_buffer)
-      (shell-command (format "objdump -dr %s.o" (buffer-name)) dis_buffer dis_buffer)
-      (select-window dis_window))
-    (with-current-buffer dis_buffer (llvm-mode)))
-  )
-
-(define-key rust-mode-map (kbd "C-c d") 'rust-disassemble)
 #+END_SRC
 
 ** C/C++
@@ -520,13 +496,6 @@
 (add-hook 'c++-mode-hook 'c-hooks)
 #+END_SRC
 
-*** SR-Speedbar. Project browser for C
-#+BEGIN_SRC emacs-lisp
-(use-package sr-speedbar
-  :ensure t
-  )
-#+END_SRC
-
 *** Company-C
 #+BEGIN_SRC emacs-lisp
 (when (package-installed-p 'company)
@@ -545,7 +514,17 @@
 *** Web-mode
 #+BEGIN_SRC emacs-lisp
 (use-package web-mode
-  :ensure t)
+  :config
+    ;(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    ;(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    ;(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    ;(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    ;(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    ;(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    ;(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  :ensure t
+)
 #+END_SRC
 
 *** JavaScript, ES6, Typescript
@@ -553,9 +532,6 @@
 (use-package js2-mode
   :ensure t
   :config
-  ;;(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-  ;;(add-to-list 'auto-mode-alist '("\\.jsx?\\'" . js2-jsx-mode))
-  ;;(add-to-list 'interpreter-mode-alist '("node" . js2-jsx-mode))
   (add-hook 'js-mode-hook 'js2-minor-mode)
 )
 
@@ -587,7 +563,6 @@
       :placeOpenBraceOnNewLineForFunctions nil))
   
   (add-hook 'js2-mode-hook #'setup-tide-mode)
-  (require 'web-mode)
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
   (add-hook 'web-mode-hook
           (lambda ()
@@ -596,6 +571,15 @@
 )
 #+END_SRC
 
+*** Elm
+#+BEGIN_SRC emacs-lisp
+(use-package elm-mode
+  :ensure t
+  :config
+  (add-hook 'elm-mode-hook #'elm-oracle-setup-completion)
+  (add-to-list 'company-backends 'company-elm)
+)
+#+END_SRC
 * Customizations
 #+BEGIN_SRC emacs-lisp
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
