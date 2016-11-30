@@ -1,3 +1,14 @@
+
+* Package-Mode
+#+BEGIN_SRC emacs-lisp
+(setq PACKAGEMODE "PRIVATE")
+(defun set-package-mode (mode)
+  (setq PACKAGEMODE (substring mode 12 nil))
+  (message (concat "Packagemode is " PACKAGEMODE))
+)
+(add-to-list 'command-switch-alist '("packagemode=PRIVATE" . set-package-mode))
+(add-to-list 'command-switch-alist '("packagemode=WORK" . set-package-mode))
+#+END_SRC
 * Package repository settings
 #+BEGIN_SRC emacs-lisp
 (require 'package)
@@ -93,6 +104,18 @@
 (setq inhibit-startup-message t)
 #+END_SRC
 
+** Theme
+#+BEGIN_SRC emacs-lisp
+;;(use-package monokai-theme
+;;  :ensure t
+;;  )
+(use-package apropospriate-theme
+  :ensure t
+  :config 
+  (load-theme 'apropospriate-dark t)
+)
+#+END_SRC
+
 ** Maximize window at startup
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -135,7 +158,7 @@
 
 ** Font
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono 13"))
+(add-to-list 'default-frame-alist '(font . "Inconsolata 13"))
 ;(set-face-attribute 'default t :font "DejaVu Sans Mono-12")
 ;(set-frame-font "DejaVu Sans Mono-11" nil t)
 #+END_SRC
@@ -207,13 +230,6 @@
   :config
   (smex-initialize)
   (global-set-key (kbd "M-x") 'smex)
-  :ensure t
-  )
-#+END_SRC
-
-** Theme
-#+BEGIN_SRC emacs-lisp
-(use-package monokai-theme
   :ensure t
   )
 #+END_SRC
@@ -351,10 +367,16 @@
 ** Cursor
 #+BEGIN_SRC emacs-lisp
 (setq-default cursor-type 'box)
-(set-face-attribute 'region nil :background "turquoise")
-(set-cursor-color "orange")
+;(set-face-attribute 'region nil :background "turquoise")
+;(set-cursor-color "orange")
 #+END_SRC
 
+** Indentation
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil
+                tab-width 2
+                indent-line-function 'insert-tab)
+#+END_SRC
 * Functions
 ** Open .emacs file
 #+BEGIN_SRC emacs-lisp
@@ -445,79 +467,90 @@
 ** Rust
 *** Flycheck-Rust
 #+BEGIN_SRC emacs-lisp
-(when (package-installed-p 'flycheck)
-  (use-package flycheck-rust
-    :config
-    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-    :ensure t
+(if (equal PACKAGEMODE "PRIVATE")
+  (when (package-installed-p 'flycheck)
+    (use-package flycheck-rust
+      :config
+      (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+      :ensure t
     )
   )
+)
 #+END_SRC
 
 *** Rust-Mode
 #+BEGIN_SRC emacs-lisp
-(use-package rust-mode
-  :ensure t
-  )
-(use-package racer
-  :init
-  (if (eq system-type 'gnu/linux)
-      (setq racer-cmd "~/.cargo/bin/racer")
-      (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
-  (if (eq system-type 'windows-nt)
-      (setq racer-cmd "~/.cargo/bin/racer")
-      (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
-  :config
-  (add-hook 'rust-mode-hook #'racer-mode)
-  (add-hook 'racer-mode-hook #'eldoc-mode)
-  (add-hook 'racer-mode-hook #'company-mode)
-  :ensure t
-  )
-(use-package cargo
-  :config
-  (add-hook 'rust-mode-hook 'cargo-minor-mode)
-  :ensure t
-  )
+(if (equal PACKAGEMODE "PRIVATE")
+  (use-package rust-mode
+    :ensure t)
+
+  (use-package racer
+    :init
+      (if (eq system-type 'gnu/linux)
+          (setq racer-cmd "~/.cargo/bin/racer")
+          (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
+      (if (eq system-type 'windows-nt)
+          (setq racer-cmd "~/.cargo/bin/racer")
+          (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
+    :config
+      (add-hook 'rust-mode-hook #'racer-mode)
+      (add-hook 'racer-mode-hook #'eldoc-mode)
+      (add-hook 'racer-mode-hook #'company-mode)
+    :ensure t)
+
+  (use-package cargo
+    :config
+      (add-hook 'rust-mode-hook 'cargo-minor-mode)
+    :ensure t)
+)
 #+END_SRC
 
 ** C/C++
 *** Flycheck-pkg-config
 #+BEGIN_SRC emacs-lisp
-(when (package-installed-p 'flycheck)
-  (use-package flycheck-pkg-config
-    :ensure t))
+(if (equal PACKAGEMODE "PRIVATE")
+  (when (package-installed-p 'flycheck)
+    (use-package flycheck-pkg-config
+      :ensure t))
+)
 #+END_SRC
 
 *** Flycheck C/C++ settings
 #+BEGIN_SRC emacs-lisp
-(defun flycheck_settings()
-  (setq flycheck-clang-language-standard "c++11"))
-(add-hook 'c++-mode-hook 'flycheck_settings)
+(if (equal PACKAGEMODE "PRIVATE")
+  (defun flycheck_settings()
+    (setq flycheck-clang-language-standard "c++11"))
+  (add-hook 'c++-mode-hook 'flycheck_settings)
+)
 #+END_SRC
 
 *** Hooks
 #+BEGIN_SRC emacs-lisp
-(defun kill-line_kbd() 
-  (define-key c-mode-map "\C-d" 'kill-whole-line)
-  (define-key c++-mode-map "\C-d" 'kill-whole-line))
-
-(defun c-hooks()
-  (kill-line_kbd))
-
-(add-hook 'c-mode-hook 'c-hooks)
-(add-hook 'c++-mode-hook 'c-hooks)
+(if (equal PACKAGEMODE "PRIVATE")
+  (defun kill-line_kbd() 
+    (define-key c-mode-map "\C-d" 'kill-whole-line)
+    (define-key c++-mode-map "\C-d" 'kill-whole-line))
+  
+  (defun c-hooks()
+    (kill-line_kbd))
+  
+  (add-hook 'c-mode-hook 'c-hooks)
+  (add-hook 'c++-mode-hook 'c-hooks)
+)
 #+END_SRC
 
 *** Company-C
 #+BEGIN_SRC emacs-lisp
-(when (package-installed-p 'company)
-  (use-package company-c-headers
-    :ensure t
-    :config
-    (add-to-list 'company-backends 'company-c-headers)
-    (if (eq system-type 'gnu/linux)
-      (lambda()
-        (add-to-list 'company-c-headers-path-system "/usr/include/c++/5.2.1")))
+(if (equal PACKAGEMODE "PRIVATE")
+  (when (package-installed-p 'company)
+    (use-package company-c-headers
+      :ensure t
+      :config
+      (add-to-list 'company-backends 'company-c-headers)
+      (if (eq system-type 'gnu/linux)
+        (lambda()
+          (add-to-list 'company-c-headers-path-system "/usr/include/c++/5.2.1")))
+    )
   )
 )
 #+END_SRC
@@ -542,6 +575,8 @@
 
 (use-package json-mode
   :ensure t
+  :config
+  (setq js-indent-level 2)
 )
 
 (use-package exec-path-from-shell
@@ -617,11 +652,13 @@
 #+END_SRC
 *** Elm
 #+BEGIN_SRC emacs-lisp
-(use-package elm-mode
-  :ensure t
-  :config
-  (add-hook 'elm-mode-hook #'elm-oracle-setup-completion)
-  (add-to-list 'company-backends 'company-elm)
+(if (equal PACKAGEMODE "PRIVATE")
+  (use-package elm-mode
+    :ensure t
+    :config
+    (add-hook 'elm-mode-hook #'elm-oracle-setup-completion)
+    (add-to-list 'company-backends 'company-elm)
+  )
 )
 #+END_SRC
 * Customizations
