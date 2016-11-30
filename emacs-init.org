@@ -1,13 +1,7 @@
 
 * Package-Mode
 #+BEGIN_SRC emacs-lisp
-(setq PACKAGEMODE "PRIVATE")
-(defun set-package-mode (mode)
-  (setq PACKAGEMODE (substring mode 12 nil))
-  (message (concat "Packagemode is " PACKAGEMODE))
-)
-(add-to-list 'command-switch-alist '("packagemode=PRIVATE" . set-package-mode))
-(add-to-list 'command-switch-alist '("packagemode=WORK" . set-package-mode))
+(setq PACKAGEMODE (or (getenv "EMACSPACKAGEMODE") "PRIVATE"))
 #+END_SRC
 * Package repository settings
 #+BEGIN_SRC emacs-lisp
