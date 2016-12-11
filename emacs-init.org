@@ -458,11 +458,37 @@
   (global-set-key (kbd "<f5>") 'projectile-compile-project)
   :config
   (setq projectile-completion-system 'helm)
-  (setq projectile-switch-project-action 'helm-projectile))
+  (setq projectile-switch-project-action 'helm-projectile)
+  (setq projectile-indexing-method 'alien)
+)
+
 
 (global-set-key (kbd "<f6>") 'next-error)
 #+END_SRC
+** Helm with ripgrep
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+  :config
+  ;(setq helm-grep-ag-command "TERM=eterm-color rg --color=always --smart-case --no-heading --line-number %s %s %s")
+  (helm-mode 1)
+  :ensure t
+  )
 
+(use-package helm-ag
+  :if (package-installed-p 'helm)
+  :config
+  (setq helm-ag-base-command "rg --color=never --smart-case --no-heading --line-number")
+  :ensure t
+  )
+
+(use-package helm-projectile
+  :if (and (package-installed-p 'helm-ag) (package-installed-p 'projectile))
+  :config
+  (setq projectile-switch-project-action 'helm-projectile-find-file)
+  :ensure t
+  )
+
+#+END_SRC
 ** Rust
 *** Flycheck-Rust
 #+BEGIN_SRC emacs-lisp
