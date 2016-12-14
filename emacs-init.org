@@ -485,6 +485,7 @@
   :if (and (package-installed-p 'helm-ag) (package-installed-p 'projectile))
   :config
   (setq projectile-switch-project-action 'helm-projectile-find-file)
+  (global-set-key (kbd "C-x ,") 'helm-ag-project-root)
   :ensure t
   )
 
