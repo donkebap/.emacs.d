@@ -92,10 +92,7 @@
 * UI
 ** Default directory
 #+BEGIN_SRC emacs-lisp
-(if (eq system-type 'gnu/linux)
-  (setq default-directory "~/"))
-(if (eq system-type 'windows-nt)
-  (setq default-directory "%userprofile%"))
+(setq default-directory "~/")
 #+END_SRC
 
 ** Disable startup screen
@@ -157,9 +154,7 @@
 
 ** Font
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'default-frame-alist '(font . "Inconsolata 13"))
-;(set-face-attribute 'default t :font "DejaVu Sans Mono-12")
-;(set-frame-font "DejaVu Sans Mono-11" nil t)
+(add-to-list 'default-frame-alist '(font . "Inconsolata-13" ))
 #+END_SRC
 
 ** Centered window
@@ -337,7 +332,9 @@
 ** Move lines with ALT
 #+BEGIN_SRC emacs-lisp
 (use-package drag-stuff
-  :config (drag-stuff-global-mode 1)
+  :config
+  (drag-stuff-global-mode 1)
+  (drag-stuff-define-keys)
   :ensure t
   )
 #+END_SRC
@@ -375,6 +372,26 @@
 (setq-default indent-tabs-mode nil
                 tab-width 2
                 indent-line-function 'insert-tab)
+#+END_SRC
+** Latex
+#+BEGIN_SRC emacs-lisp
+(use-package tex
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t)
+
+  (setq TeX-PDF-mode t)
+  (setq TeX-view-program-selection '((output-pdf "Zathura")))
+  )
 #+END_SRC
 * Functions
 ** Open .emacs file
@@ -510,11 +527,10 @@
 (use-package racer
   :if (equal PACKAGEMODE "PRIVATE")
   :init
-  (if (eq system-type 'gnu/linux)
-      (setq racer-cmd "~/.cargo/bin/racer")
-    (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
-  (if (eq system-type 'windows-nt)
-      (setq racer-cmd "~/.cargo/bin/racer")
+  (setq racer-cmd "~/.cargo/bin/racer")
+  (when (eq system-type 'gnu/linux)
+    (setq racer-rust-src-path "~/.multirust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"))
+  (when (eq system-type 'windows-nt)
     (setq racer-rust-src-path "~/Applications/Rust_source/src/"))
   :config
   (add-hook 'rust-mode-hook #'racer-mode)
@@ -682,6 +698,15 @@
   (add-to-list 'company-backends 'company-elm)
   )
 
+#+END_SRC
+** Lua
+#+BEGIN_SRC emacs-lisp
+(use-package lua-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+  (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
+  )
 #+END_SRC
 * Customizations
 #+BEGIN_SRC emacs-lisp
