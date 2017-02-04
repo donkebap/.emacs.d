@@ -1,8 +1,4 @@
 
-* Package-Mode
-#+BEGIN_SRC emacs-lisp
-(setq PACKAGEMODE (or (getenv "EMACSPACKAGEMODE") "PRIVATE"))
-#+END_SRC
 * Server
 #+BEGIN_SRC emacs-lisp
 (when (eq system-type 'windows-nt)
@@ -342,22 +338,30 @@
 ** Smartparens
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens
-  :bind (:map smartparens-mode-map
-          ("C-M-<left>" . sp-backward-sexp)
-          ("C-M-<right>" . sp-forward-sexp)
-          ("C-S-<backspace>" . sp-backward-kill-sexp)
-          ("C-M-<down>" . sp-select-next-thing))
-  :init
-  (setq blink-matching-paren nil)
-  (require 'smartparens-config)
-  (set-face-attribute 'sp-show-pair-match-face nil :foreground "#CCCCCC" :background nil)
-  (set-face-attribute 'sp-show-pair-mismatch-face nil :foreground "red" :background nil)
-  :config
-  (smartparens-global-mode t)
-  (show-smartparens-global-mode t)
-  :ensure t
-  :diminish smartparens-mode
-  )
+    :bind (:map smartparens-mode-map
+	("C-M-<left>" . sp-backward-sexp)
+	("C-M-<right>" . sp-forward-sexp)
+	("C-S-<backspace>" . sp-backward-kill-sexp)
+	("C-M-<down>" . sp-select-next-thing))
+    :init
+	(setq blink-matching-paren nil)
+	(require 'smartparens-config)
+	(set-face-attribute 'sp-show-pair-match-face nil :foreground "#CCCCCC" :background nil)
+	(set-face-attribute 'sp-show-pair-mismatch-face nil :foreground "red" :background nil)
+	:config
+	(smartparens-global-mode t)
+	(show-smartparens-global-mode t)
+	(sp-local-pair 'c++-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
+
+	(defun my-create-newline-and-enter-sexp (&rest _ignored)
+		"Open a new brace or bracket expression, with relevant newlines and indent. "
+		(newline)
+		(indent-according-to-mode)
+		(forward-line -1)
+		(indent-according-to-mode))
+	:ensure t
+	:diminish smartparens-mode
+	)
 #+END_SRC
 
 ** Cursor
@@ -369,9 +373,39 @@
 
 ** Indentation
 #+BEGIN_SRC emacs-lisp
-(setq-default indent-tabs-mode nil
-                tab-width 2
-                indent-line-function 'insert-tab)
+(defun my-setup-indent (n)
+  ;; java/c/c++
+  (setq-local c-basic-offset n)
+  (setq-local tab-width n)
+  ;; web development
+  (setq-local coffee-tab-width n) ; coffeescript
+  (setq-local javascript-indent-level n) ; javascript-mode
+  (setq-local js-indent-level n) ; js-mode
+  (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+  (setq-local web-mode-markup-indent-offset n) ; web-mode, html tag in html file
+  (setq-local web-mode-css-indent-offset n) ; web-mode, css in html file
+  (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
+  (setq-local css-indent-offset n) ; css-mode
+  ;;(setq-local js-indent-level n)
+  (setq-local typescript-indent-level n)
+  (setq-local evil-shift-width n)
+	(setq-local org-src-tab-acts-natively t)
+	(setq org-src-preserve-indentation t)
+  )
+
+(defun set-my-indentation ()
+  (interactive)
+  ;; use space instead of tab
+  (setq indent-tabs-mode t)
+  ;; indent 2 spaces width
+  (my-setup-indent 2))
+
+;; prog-mode-hook requires emacs24+
+(add-hook 'prog-mode-hook 'set-my-indentation)
+;; a few major-modes does NOT inherited from prog-mode
+(add-hook 'lua-mode-hook 'set-my-indentation)
+(add-hook 'web-mode-hook 'set-my-indentation)
+(add-hook 'org-mode-hook 'set-my-indentation)
 #+END_SRC
 ** Latex
 #+BEGIN_SRC emacs-lisp
@@ -392,6 +426,23 @@
   (setq TeX-PDF-mode t)
   (setq TeX-view-program-selection '((output-pdf "Zathura")))
   )
+#+END_SRC
+** Evil
+#+BEGIN_SRC emacs-lisp
+(use-package evil
+  :config
+  (evil-mode 1)
+  :ensure t)
+
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1)
+  :ensure t)
+
+(use-package evil-nerd-commenter
+  :config
+  (evilnc-default-hotkeys)
+  :ensure t)
 #+END_SRC
 * Functions
 ** Open .emacs file
@@ -511,7 +562,7 @@
 *** Flycheck-Rust
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-rust
-  :if (and (equal PACKAGEMODE "PRIVATE") (package-installed-p 'flycheck))
+  :if (package-installed-p 'flycheck)
   :config
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
   :ensure t
@@ -521,11 +572,9 @@
 *** Rust-Mode
 #+BEGIN_SRC emacs-lisp
 (use-package rust-mode
-  :if (equal PACKAGEMODE "PRIVATE")
   :ensure t)
 
 (use-package racer
-  :if (equal PACKAGEMODE "PRIVATE")
   :init
   (setq racer-cmd "~/.cargo/bin/racer")
   (when (eq system-type 'gnu/linux)
@@ -539,7 +588,6 @@
   :ensure t)
 
 (use-package cargo
-  :if (equal PACKAGEMODE "PRIVATE")
   :config
   (add-hook 'rust-mode-hook 'cargo-minor-mode)
   :ensure t)
@@ -550,39 +598,33 @@
 *** Flycheck-pkg-config
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-pkg-config
-  :if (and (equal PACKAGEMODE "PRIVATE") (package-installed-p 'flycheck))
+  :if (package-installed-p 'flycheck)
   :ensure t)
 
 #+END_SRC
 
 *** Flycheck C/C++ settings
 #+BEGIN_SRC emacs-lisp
-(if (equal PACKAGEMODE "PRIVATE")
-  (defun flycheck_settings()
+(defun flycheck_settings()
     (setq flycheck-clang-language-standard "c++11"))
-  (add-hook 'c++-mode-hook 'flycheck_settings)
-)
+(add-hook 'c++-mode-hook 'flycheck_settings)
 #+END_SRC
 
 *** Hooks
 #+BEGIN_SRC emacs-lisp
-(if (equal PACKAGEMODE "PRIVATE")
-  (defun kill-line_kbd() 
+(defun kill-line_kbd() 
     (define-key c-mode-map "\C-d" 'kill-whole-line)
     (define-key c++-mode-map "\C-d" 'kill-whole-line))
-  
-  (defun c-hooks()
+(defun c-hooks()
     (kill-line_kbd))
-  
-  (add-hook 'c-mode-hook 'c-hooks)
-  (add-hook 'c++-mode-hook 'c-hooks)
-)
+(add-hook 'c-mode-hook 'c-hooks)
+(add-hook 'c++-mode-hook 'c-hooks)
 #+END_SRC
 
 *** Company-C
 #+BEGIN_SRC emacs-lisp
 (use-package company-c-headers
-  :if (and (equal PACKAGEMODE "PRIVATE") (package-installed-p 'company))
+  :if (package-installed-p 'company)
   :ensure t
   :config
   (add-to-list 'company-backends 'company-c-headers)
@@ -612,14 +654,10 @@
 )
 
 (use-package json-mode
-  :ensure t
-  :config
-  (setq js-indent-level 2)
-)
+  :ensure t)
 
 (use-package exec-path-from-shell
-  :ensure t
-)
+  :ensure t)
 
 ;; https://github.com/purcell/exec-path-from-shell
 ;; only need exec-path-from-shell on OSX
@@ -643,14 +681,8 @@
 
 (add-to-list 'auto-mode-alist '("\\.js$" . web-mode))
 
-;; adjust indents for web-mode to 2 spaces
 (defun my-web-mode-hook ()
-  "Hooks for Web mode. Adjust indents"
-  ;;; http://web-mode.org/
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2))
-  (setq web-mode-tag-auto-close-style 0)
+  (setq web-mode-tag-auto-close-style 0))
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 
 ;; for better jsx syntax-highlighting in web-mode
@@ -691,7 +723,6 @@
 *** Elm
 #+BEGIN_SRC emacs-lisp
 (use-package elm-mode
-  :if (equal PACKAGEMODE "PRIVATE")
   :ensure t
   :config
   (add-hook 'elm-mode-hook #'elm-oracle-setup-completion)
