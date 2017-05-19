@@ -23,6 +23,16 @@
 (require 'use-package)
   #+END_SRC
   
+* PATH
+#+BEGIN_SRC emacs-lisp
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (setq-default exec-path-from-shell-arguments nil)
+    (exec-path-from-shell-initialize)
+    )
+  :ensure t)
+#+END_SRC
 * Keybindings
 ** Open file in new window [C-x M-f]
    #+BEGIN_SRC emacs-lisp
@@ -143,25 +153,6 @@
 ** Font
    #+BEGIN_SRC emacs-lisp
 (add-to-list 'default-frame-alist '(font . "Inconsolata-13" ))
-   #+END_SRC
-   
-** Centered window
-   #+BEGIN_SRC emacs-lisp
-(use-package centered-window-mode
-  :init
-  (defun cwm/center ()
-    (set-fringe-mode
-     (let ((right_fringe
-	    (/ (- (frame-pixel-width)
-		  (* 110 (frame-char-width)))
-	       2)))
-       (cons (- right_fringe 50) right_fringe))
-     ))
-  :config
-  (centered-window-mode t)
-  :ensure t
-  :diminish centered-window-mode
-  )
    #+END_SRC
    
 ** Adaptive wrap lines
@@ -430,7 +421,8 @@
 (setq fixme-modes '(rust-mode
                     c++-mode
                     c-mode
-                    emacs-lisp-mode))
+                    emacs-lisp-mode
+		    typescript-mode))
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
 (mapc (lambda (mode)
@@ -600,12 +592,6 @@
 
 (use-package json-mode
   :ensure t)
-
-(use-package exec-path-from-shell
-  :ensure t)
-
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize))
 
 (setq-default flycheck-disabled-checkers
 	      (append flycheck-disabled-checkers
