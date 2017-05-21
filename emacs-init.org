@@ -34,17 +34,6 @@
   :ensure t)
 #+END_SRC
 * Keybindings
-** Open file in new window [C-x M-f]
-   #+BEGIN_SRC emacs-lisp
-(defun open-file-in-new-vertical-split()
-  (interactive)
-  (select-window (split-window-right))
-  (ido-find-file)
-  )
-
-(global-set-key (kbd "C-x M-f") 'open-file-in-new-vertical-split)
-   #+END_SRC
-   
 ** Switch buffers [C-TAB/C-S-TAB]
    #+BEGIN_SRC emacs-lisp
 (global-set-key [C-tab] 'other-window)
@@ -121,10 +110,6 @@
 (menu-bar-mode -1)
    #+END_SRC
    
-** Disable find-file auto-search
-   #+BEGIN_SRC emacs-lisp
-(setq ido-auto-merge-work-directories-length -1)
-   #+END_SRC
 ** Disable scrolling acceleration
    #+BEGIN_SRC emacs-lisp
 (setq mouse-wheel-progressive-speed nil)
@@ -182,14 +167,6 @@
 ** DIRED+. Extension to dired
    #+BEGIN_SRC emacs-lisp
 (use-package dired+
-  :ensure t)
-   #+END_SRC
-   
-** IDO
-   #+BEGIN_SRC emacs-lisp
-(use-package ido
-  :config
-  (ido-mode t)
   :ensure t)
    #+END_SRC
    
