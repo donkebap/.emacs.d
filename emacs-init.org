@@ -4,6 +4,10 @@
 (when (eq system-type 'windows-nt)
   (server-start))
   #+END_SRC
+* Shell
+#+BEGIN_SRC emacs-lisp
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+#+END_SRC
 * Package repository settings
   #+BEGIN_SRC emacs-lisp
 (require 'package)
@@ -137,7 +141,7 @@
    
 ** Font
    #+BEGIN_SRC emacs-lisp
-(add-to-list 'default-frame-alist '(font . "Inconsolata-13" ))
+(add-to-list 'default-frame-alist '(font . "Hack-12" ))
    #+END_SRC
    
 ** Adaptive wrap lines
