@@ -12,8 +12,8 @@
   #+BEGIN_SRC emacs-lisp
 (require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-			 ("melpa" . "https://melpa.org/packages/")
-			 ("elpy" . "https://jorgenschaefer.github.io/packages/")
+			 ("melpa" . "http://melpa.org/packages/")
+			 ("elpy" . "http://jorgenschaefer.github.io/packages/")
 			 ("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
   #+END_SRC
@@ -92,7 +92,10 @@
 * UI
 ** Default directory
    #+BEGIN_SRC emacs-lisp
-(setq default-directory "~/")
+(when (eq system-type 'windows-nt)
+  (setq default-directory "%userprofile%"))
+(when (eq system-type 'gnu/linux)
+  (setq default-directory "~/"))
    #+END_SRC
    
 ** Disable startup screen
@@ -419,6 +422,9 @@
 ** Version control
    #+BEGIN_SRC emacs-lisp
 (use-package magit
+  :config
+  (when (eq system-type 'windows-nt)
+    (setenv "GIT_ASKPASS" "git-gui--askpass"))
   :ensure t)
    #+END_SRC
    
@@ -493,7 +499,7 @@
 
 (use-package lsp-mode
     :init
-    (add-hook 'prog-mode-hook 'lsp-mode)
+    (add-hook 'rust-mode-hook 'lsp-mode)
     :config
     (use-package lsp-flycheck
         :ensure f ; comes with lsp-mode
