@@ -6,7 +6,7 @@
   #+END_SRC
 * Shell
 #+BEGIN_SRC emacs-lisp
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(add-to-list 'default-frame-alist '(tty-color-mode  . -1))
 #+END_SRC
 * Package repository settings
   #+BEGIN_SRC emacs-lisp
