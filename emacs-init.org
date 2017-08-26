@@ -425,6 +425,7 @@
   :config
   (when (eq system-type 'windows-nt)
     (setenv "GIT_ASKPASS" "git-gui--askpass"))
+  (setq magit-diff-refine-hunk t)
   :ensure t)
    #+END_SRC
    
