@@ -424,7 +424,13 @@
 (use-package magit
   :config
   (when (eq system-type 'windows-nt)
-    (setenv "GIT_ASKPASS" "git-gui--askpass"))
+    (setenv "GIT_ASKPASS" "git-gui--askpass")
+    (setenv "SSH_ASKPASS" "git-gui--askpass")
+    )
+  (when (eq system-type 'gnu/linux)
+    (exec-path-from-shell-copy-env "SSH_AGENT_PID")
+    (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
+    )
   (setq magit-diff-refine-hunk t)
   :ensure t)
    #+END_SRC
