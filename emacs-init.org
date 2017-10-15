@@ -344,7 +344,6 @@
   (setq-local coffee-tab-width n)
   (setq-local javascript-indent-level n)
   (setq-local js-indent-level n)
-  (setq-local js2-basic-offset n)
   (setq-local web-mode-markup-indent-offset n)
   (setq-local web-mode-css-indent-offset n)
   (setq-local web-mode-code-indent-offset n)
@@ -369,6 +368,7 @@
 (add-hook 'web-mode-hook 'set-my-indentation)
 (add-hook 'org-mode-hook 'set-my-indentation)
 (add-hook 'typescript-mode-hook 'set-my-indentation)
+(add-hook 'c++-mode-hook 'set-my-indentation)
    #+END_SRC
 ** Latex
    #+BEGIN_SRC emacs-lisp
@@ -527,7 +527,7 @@
 *** Flycheck C/C++ settings
     #+BEGIN_SRC emacs-lisp
 (defun flycheck_settings()
-  (setq flycheck-clang-language-standard "c++11"))
+  (setq flycheck-clang-language-standard "c++14"))
 (add-hook 'c++-mode-hook 'flycheck_settings)
     #+END_SRC
     
@@ -551,9 +551,23 @@
   (add-to-list 'company-backends 'company-c-headers)
   (if (eq system-type 'gnu/linux)
       (lambda()
-        (add-to-list 'company-c-headers-path-system "/usr/include/c++/5.2.1")))
+        (add-to-list 'company-c-headers-path-system "/usr/include/c++/7.2.0")))
   )
     #+END_SRC
+
+*** Tags
+#+BEGIN_SRC emacs-lisp
+(use-package dumb-jump
+  :bind (("M-g o" . dumb-jump-go-other-window)
+         ("M-g j" . dumb-jump-go)
+         ("M-g i" . dumb-jump-go-prompt)
+         ("M-g x" . dumb-jump-go-prefer-external)
+         ("M-g z" . dumb-jump-go-prefer-external-other-window))
+  :config
+(setq dumb-jump-selector 'helm)
+(setq dumb-jump-force-searcher 'rg)
+  :ensure)
+#+END_SRC
     
 ** Webdev
 *** Web-mode
