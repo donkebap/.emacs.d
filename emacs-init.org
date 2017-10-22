@@ -105,10 +105,9 @@
    
 ** Theme
    #+BEGIN_SRC emacs-lisp
-(use-package apropospriate-theme
+(use-package creamsody-theme
   :ensure t
-  :config
-  (load-theme 'apropospriate-dark t))
+  :config)
    #+END_SRC
    
 ** Disable toolbar
@@ -358,8 +357,8 @@
   (interactive)
   ;; use space instead of tab
   (setq indent-tabs-mode t)
-  ;; indent 2 spaces width
-  (my-setup-indent 2))
+  ;; indent 4 spaces width
+  (my-setup-indent 4))
 
 ;; prog-mode-hook requires emacs24+
 (add-hook 'prog-mode-hook 'set-my-indentation)
