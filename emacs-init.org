@@ -92,10 +92,7 @@
 * UI
 ** Default directory
    #+BEGIN_SRC emacs-lisp
-(when (eq system-type 'windows-nt)
-  (setq default-directory "%userprofile%"))
-(when (eq system-type 'gnu/linux)
-  (setq default-directory "~/"))
+(setq default-directory "~/")
    #+END_SRC
    
 ** Disable startup screen
