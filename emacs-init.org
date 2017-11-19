@@ -1,9 +1,4 @@
 
-* Server
-  #+BEGIN_SRC emacs-lisp
-(when (eq system-type 'windows-nt)
-  (server-start))
-  #+END_SRC
 * Shell
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'default-frame-alist '(tty-color-mode  . -1))
@@ -128,11 +123,6 @@
 (setq ring-bell-function 'ignore)
    #+END_SRC
    
-** Hide wrapped-line-arrow
-   #+BEGIN_SRC emacs-lisp
-(global-visual-line-mode t)
-   #+END_SRC
-   
 ** Display line numbers
    #+BEGIN_SRC emacs-lisp
 (global-linum-mode t)
@@ -141,19 +131,6 @@
 ** Font
    #+BEGIN_SRC emacs-lisp
 (add-to-list 'default-frame-alist '(font . "Hack-12" ))
-   #+END_SRC
-   
-** Adaptive wrap lines
-   #+BEGIN_SRC emacs-lisp
-(use-package adaptive-wrap
-  :init
-  (define-globalized-minor-mode adaptive-wrap-global-mode
-    adaptive-wrap-prefix-mode
-    adaptive-wrap-prefix-mode)
-  :config
-  (adaptive-wrap-global-mode)
-  :ensure t
-  )
    #+END_SRC
    
 ** Windmove. Navigate frames
@@ -191,36 +168,6 @@
   (custom-set-faces
    '(spaceline-highlight-face ((t (:foreground "yellow" :background "red")))))
   :ensure t)
-   #+END_SRC
-   
-** ToggleWindowSplit [C-x |]
-   #+BEGIN_SRC emacs-lisp
-(defun toggle-window-split ()
-  (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-	     (next-win-buffer (window-buffer (next-window)))
-	     (this-win-edges (window-edges (selected-window)))
-	     (next-win-edges (window-edges (next-window)))
-	     (this-win-2nd (not (and (<= (car this-win-edges)
-					 (car next-win-edges))
-				     (<= (cadr this-win-edges)
-					 (cadr next-win-edges)))))
-	     (splitter
-	      (if (= (car this-win-edges)
-		     (car (window-edges (next-window))))
-		  'split-window-horizontally
-		'split-window-vertically)))
-	(delete-other-windows)
-	(let ((first-win (selected-window)))
-	  (funcall splitter)
-	  (if this-win-2nd (other-window 1))
-	  (set-window-buffer (selected-window) this-win-buffer)
-	  (set-window-buffer (next-window) next-win-buffer)
-	  (select-window first-win)
-	  (if this-win-2nd (other-window 1))))))
-
-(global-set-key (kbd "C-x |") 'toggle-window-split)
    #+END_SRC
    
 * Editing
@@ -396,25 +343,6 @@
    #+END_SRC
    
 * Programming
-** Highlight TODO/NOTE
-   #+BEGIN_SRC emacs-lisp
-(setq fixme-modes '(rust-mode
-                    c++-mode
-                    c-mode
-                    emacs-lisp-mode
-		    typescript-mode))
-(make-face 'font-lock-fixme-face)
-(make-face 'font-lock-note-face)
-(mapc (lambda (mode)
-	(font-lock-add-keywords
-	 mode
-	 '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-	   ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
-      fixme-modes)
-(modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
-(modify-face 'font-lock-note-face "Green" nil nil t nil t nil nil)
-   #+END_SRC
-   
 ** Version control
    #+BEGIN_SRC emacs-lisp
 (use-package magit
