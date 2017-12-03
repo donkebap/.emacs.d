@@ -159,17 +159,6 @@
   :ensure t)
    #+END_SRC
    
-** Spaceline Modeline
-   #+BEGIN_SRC emacs-lisp
-(use-package spaceline
-  :config
-  (require 'spaceline-config)
-  (spaceline-spacemacs-theme)
-  (custom-set-faces
-   '(spaceline-highlight-face ((t (:foreground "yellow" :background "red")))))
-  :ensure t)
-   #+END_SRC
-   
 * Editing
 ** Disable #backup
    #+BEGIN_SRC emacs-lisp
@@ -284,18 +273,21 @@
 ** Indentation
    #+BEGIN_SRC emacs-lisp
 (defun my-setup-indent (n)
-  (setq-local coffee-tab-width n)
-  (setq-local javascript-indent-level n)
-  (setq-local js-indent-level n)
-  (setq-local web-mode-markup-indent-offset n)
-  (setq-local web-mode-css-indent-offset n)
-  (setq-local web-mode-code-indent-offset n)
-  (setq-local web-mode-attr-indent-offset n)
-  (setq-local css-indent-offset n)
-  (setq-local typescript-indent-level n)
-  (setq-local lua-indent-level n)
-  (setq-local evil-shift-width n)
-  (setq-local org-src-tab-acts-natively t))
+    (setq-local coffee-tab-width n)
+    (setq-local javascript-indent-level n)
+    (setq-local js-indent-level n)
+    (setq-local web-mode-markup-indent-offset n)
+    (setq-local web-mode-css-indent-offset n)
+    (setq-local web-mode-code-indent-offset n)
+    (setq-local web-mode-attr-indent-offset n)
+    (setq-local css-indent-offset n)
+    (setq-local typescript-indent-level n)
+    (setq-local lua-indent-level n)
+    (setq-local evil-shift-width n)
+    (setq-local rust-indent-offset n)
+    (setq-local lisp-indent-offset n)
+    (setq-local org-edit-src-content-indentation n)
+    (setq-local org-src-tab-acts-natively t))
 
 (defun set-my-indentation ()
   (interactive)
@@ -555,15 +547,6 @@
 	'(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil)))
     #+END_SRC
     
-** Lua
-   #+BEGIN_SRC emacs-lisp
-(use-package lua-mode
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-  (add-to-list 'interpreter-mode-alist '("lua" . lua-mode)))
-   #+END_SRC
-#+END_SRC
 * Customizations
   #+BEGIN_SRC emacs-lisp
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
