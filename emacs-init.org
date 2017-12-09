@@ -354,8 +354,6 @@
 ** Flycheck
    #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :init
-  (global-flycheck-mode)
   :ensure t
   :config
   ;; customize flycheck temp file prefix
@@ -421,14 +419,18 @@
     (setq rust-format-on-save t))
 
 (use-package lsp-mode
-    :init
-    (add-hook 'rust-mode-hook 'lsp-mode)
     :config
+    (add-hook 'rust-mode-hook 'lsp-mode)
     (use-package lsp-flycheck
         :ensure f ; comes with lsp-mode
         :after flycheck))
 
 (use-package lsp-rust
+    :init
+    (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
+    :config
+    (add-hook 'rust-mode-hook #'lsp-rust-enable)
+    (add-hook 'rust-mode-hook #'flycheck-mode)
     :after lsp-mode)
     #+END_SRC
     
