@@ -1,78 +1,51 @@
-
+* Functions
+** Open .emacs file
+   #+BEGIN_SRC emacs-lisp
+(defvar dot_emacs_file_path (concat user-emacs-directory "emacs-init.org"))
+(defun dotemacsfile ()
+  (interactive)
+  (with-current-buffer (find-file dot_emacs_file_path)))
+   #+END_SRC
+** Reload emacs configuration
+   #+BEGIN_SRC emacs-lisp
+(defun config-reload ()
+    "Reloads ~/.emacs.d/config.org at runtime"
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/emacs-init.org")))
+(global-set-key (kbd "C-c r") 'config-reload)
+   #+END_SRC
 * Shell
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'default-frame-alist '(tty-color-mode  . -1))
 #+END_SRC
-* Package repository settings
-  #+BEGIN_SRC emacs-lisp
-(require 'package)
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-			 ("melpa" . "http://melpa.org/packages/")
-			 ("elpy" . "http://jorgenschaefer.github.io/packages/")
-			 ("org" . "http://orgmode.org/elpa/")))
-(package-initialize)
-  #+END_SRC
-  
-* Use-Package
-  #+BEGIN_SRC emacs-lisp
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package)
-  )
-(require 'use-package)
-  #+END_SRC
-  
-* PATH
+* Terminal
+** Default shell
 #+BEGIN_SRC emacs-lisp
-(use-package exec-path-from-shell
-  :config
-  (when (memq window-system '(mac ns x))
-    (setq-default exec-path-from-shell-arguments nil)
-    (exec-path-from-shell-initialize)
-    )
-  :ensure t)
+(defvar my-term-shell "/bin/zsh")
+(defadvice ansi-term (before force-bash)
+  (interactive (list my-term-shell)))
+(ad-activate 'ansi-term)
+#+END_SRC
+** Open shell keybind [Mod+Return]
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<s-return>") 'ansi-term)
 #+END_SRC
 * Keybindings
-** Switch buffers [C-TAB/C-S-TAB]
-   #+BEGIN_SRC emacs-lisp
-(global-set-key [C-tab] 'other-window)
-(global-set-key [C-S-tab]
-		(lambda ()
-		  (interactive)
-		  (other-window -1)))
-   #+END_SRC
-   
-** Delete line [C-d]
-   #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-d") 'kill-whole-line)
-   #+END_SRC
-   
-** Jump to start of code [C-a]
-   #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-a") 'back-to-indentation)
-   #+END_SRC
-   
 ** Kill buffer and window [C-x C-k C-k]
    #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-x C-k C-k") 'kill-buffer-and-window)
    #+END_SRC
-   
-** Save buffer [M-s]
-   #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-s") (quote save-buffer))
-   #+END_SRC
 * Org
 ** Org mode open links and allow shift select
    #+BEGIN_SRC emacs-lisp
-(setq org-src-fontify-natively t
-      org-pretty-entities t
-      org-src-preserve-indentation t
-      org-src-window-setup 'current-window
-      org-edit-src-auto-save-idle-delay 60
-      org-return-follows-link t
-      org-support-shift-select t)
+     (setq org-src-fontify-natively t
+	   org-pretty-entities t
+	   org-src-preserve-indentation t
+	   org-src-window-setup 'current-window
+	   org-edit-src-auto-save-idle-delay 60
+	   org-return-follows-link t
+	   org-support-shift-select t)
    #+END_SRC
-   
 ** Language support
    #+BEGIN_SRC emacs-lisp
 (org-babel-do-load-languages
@@ -80,79 +53,9 @@
  '((latex . t)
    (python . t)
    (gnuplot . t)
-   (sh . t)
+   (shell . t)
    (sql . t)))
    #+END_SRC
-   
-* UI
-** Default directory
-   #+BEGIN_SRC emacs-lisp
-(setq default-directory "~/")
-   #+END_SRC
-   
-** Disable startup screen
-   #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-message t)
-   #+END_SRC
-   
-** Theme
-   #+BEGIN_SRC emacs-lisp
-(use-package creamsody-theme
-  :ensure t
-  :config)
-   #+END_SRC
-   
-** Disable toolbar
-   #+BEGIN_SRC emacs-lisp
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-   #+END_SRC
-   
-** Disable scrolling acceleration
-   #+BEGIN_SRC emacs-lisp
-(setq mouse-wheel-progressive-speed nil)
-   #+END_SRC
-   
-** Shorten yes/no
-   #+BEGIN_SRC emacs-lisp
-(fset 'yes-or-no-p 'y-or-n-p)
-   #+END_SRC
-   
-** Disable error sound
-   #+BEGIN_SRC emacs-lisp
-(setq ring-bell-function 'ignore)
-   #+END_SRC
-   
-** Display line numbers
-   #+BEGIN_SRC emacs-lisp
-(global-linum-mode t)
-   #+END_SRC
-   
-** Font
-   #+BEGIN_SRC emacs-lisp
-(add-to-list 'default-frame-alist '(font . "Iosevka-16" ))
-   #+END_SRC
-   
-** Windmove. Navigate frames
-   #+BEGIN_SRC emacs-lisp
-(use-package windmove
-  :config
-  (global-set-key (kbd "C-c <left>")  'windmove-left)
-  (global-set-key (kbd "C-c <right>") 'windmove-right)
-  (global-set-key (kbd "C-c <up>")    'windmove-up)
-  (global-set-key (kbd "C-c <down>")  'windmove-down)
-  :ensure t)
-   #+END_SRC
-   
-** SMEX
-   #+BEGIN_SRC emacs-lisp
-(use-package smex
-  :config
-  (smex-initialize)
-  (global-set-key (kbd "M-x") 'smex)
-  :ensure t)
-   #+END_SRC
-   
 * Editing
 ** Disable #backup
    #+BEGIN_SRC emacs-lisp
@@ -164,53 +67,13 @@
       backup-directory-alist '((".*" . "~/.emacs.d/save/backup/")))
 (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
    #+END_SRC
-** C-Arrow navigation
-   #+BEGIN_SRC emacs-lisp
-(defun previous-blank-line ()
-  "Moves to the previous line containing nothing but whitespace."
-  (interactive)
-  (search-backward-regexp "^[ \t]*\n"))
-
-(defun next-blank-line ()
-  "Moves to the next line containing nothing but whitespace."
-  (interactive)
-  (forward-line)
-  (search-forward-regexp "^[ \t]*\n")
-  (forward-line -1))
-
-(define-key global-map [C-right] 'forward-word)
-(define-key global-map [C-left] 'backward-word)
-(define-key global-map [C-up] 'previous-blank-line)
-(define-key global-map [C-down] 'next-blank-line)
-   #+END_SRC
-   
-** Expand region
-   #+BEGIN_SRC emacs-lisp
-(use-package expand-region
-	:config
-	(global-set-key (kbd "C-)") 'er/expand-region)
-	(global-set-key (kbd "C-(") 'er/contract-region)
-	(er/enable-mode-expansions 'web-mode 'er/add-js-mode-expansions)
-	:ensure t
-	)
-   #+END_SRC
 ** Undo
-*** Undo limit
-    # Stop Emacs from losing undo information by
-    # setting very high limits for undo buffers
-    #+BEGIN_SRC emacs-lisp
+   # Stop Emacs from losing undo information by
+   # setting very high limits for undo buffers
+   #+BEGIN_SRC emacs-lisp
 (setq undo-limit 20000000)
 (setq undo-strong-limit 40000000)
-    #+END_SRC
-    
-*** Undo tree
-    #+BEGIN_SRC emacs-lisp
-(use-package undo-tree
-  :ensure t
-  :config
-  (global-undo-tree-mode))
-    #+END_SRC
-    
+   #+END_SRC
 ** Disable overwrite key
    #+BEGIN_SRC emacs-lisp
 (define-key global-map [(insert)] nil)
@@ -219,49 +82,6 @@
 ** Overwrite selected text
    #+BEGIN_SRC emacs-lisp
 (delete-selection-mode 1)
-   #+END_SRC
-   
-** Move lines with ALT
-   #+BEGIN_SRC emacs-lisp
-(use-package drag-stuff
-  :config
-  (drag-stuff-global-mode 1)
-  (drag-stuff-define-keys)
-  :ensure t
-  )
-   #+END_SRC
-   
-** Smartparens
-   #+BEGIN_SRC emacs-lisp
-(use-package smartparens
-  :bind (:map smartparens-mode-map
-	      ("C-M-<left>" . sp-backward-sexp)
-	      ("C-M-<right>" . sp-forward-sexp)
-	      ("C-S-<backspace>" . sp-backward-kill-sexp)
-	      ("C-M-<down>" . sp-select-next-thing))
-  :init
-  (setq blink-matching-paren nil)
-  (require 'smartparens-config)
-  (set-face-attribute 'sp-show-pair-match-face nil :foreground "#CCCCCC" :background nil)
-  (set-face-attribute 'sp-show-pair-mismatch-face nil :foreground "red" :background nil)
-  :config
-  (smartparens-global-mode t)
-  (show-smartparens-global-mode t)
-  (sp-local-pair 'c++-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
-
-  (defun my-create-newline-and-enter-sexp (&rest _ignored)
-    "Open a new brace or bracket expression, with relevant newlines and indent. "
-    (newline)
-    (indent-according-to-mode)
-    (forward-line -1)
-    (indent-according-to-mode))
-  :ensure t
-  :diminish smartparens-mode)
-   #+END_SRC
-   
-** Cursor
-   #+BEGIN_SRC emacs-lisp
-(setq-default cursor-type 'box)
    #+END_SRC
    
 ** Indentation
@@ -299,6 +119,287 @@
 (add-hook 'typescript-mode-hook 'set-my-indentation)
 (add-hook 'c++-mode-hook 'set-my-indentation)
    #+END_SRC
+** Encoding
+#+BEGIN_SRC emacs-lisp
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+#+END_SRC
+* UI
+** Default directory
+   #+BEGIN_SRC emacs-lisp
+(setq default-directory "~/")
+   #+END_SRC
+** Disable startup screen
+   #+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-message t)
+   #+END_SRC
+** Disable toolbar
+   #+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+   #+END_SRC
+** Disable scrolling acceleration
+   #+BEGIN_SRC emacs-lisp
+(setq mouse-wheel-progressive-speed nil)
+   #+END_SRC
+** Shorten yes/no
+   #+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+   #+END_SRC
+** Disable error sound
+   #+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+   #+END_SRC
+** Display line numbers
+   #+BEGIN_SRC emacs-lisp
+(global-linum-mode t)
+   #+END_SRC
+** Disable word-wrap
+#+BEGIN_SRC emacs-lisp
+(toggle-truncate-lines)
+#+END_SRC
+** Font
+   #+BEGIN_SRC emacs-lisp
+(add-to-list 'default-frame-alist '(font . "Iosevka-16" ))
+   #+END_SRC
+** Highlight
+#+BEGIN_SRC emacs-lisp
+(when window-system (add-hook 'prog-mode-hook 'hl-line-mode))
+#+END_SRC
+** Cursor
+   #+BEGIN_SRC emacs-lisp
+(setq-default cursor-type 'box)
+   #+END_SRC
+** Time
+#+BEGIN_SRC emacs-lisp
+(setq display-time-24hr-format t)
+(setq display-time-format "%H:%M - %d %B %Y")
+(display-time-mode 1)
+#+END_SRC
+** ibuffer
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x b") 'ibuffer)
+#+END_SRC
+* Package repository settings
+  #+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+			    ("melpa" . "http://melpa.org/packages/")
+			    ("elpy" . "http://jorgenschaefer.github.io/packages/")
+			    ("org" . "http://orgmode.org/elpa/")))
+(package-initialize)
+  #+END_SRC
+* Use-Package
+  #+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package)
+  )
+(require 'use-package)
+  #+END_SRC
+* exwm
+** COMMENT exwm
+#+BEGIN_SRC emacs-lisp
+(use-package exwm
+    :ensure t
+    :config
+    (require 'exwm-config)
+    (exwm-config-default)
+    (require 'exwm-systemtray)
+    (exwm-systemtray-enable)
+
+    (setq exwm-workspace-number 1)
+
+    (require 'exwm-randr)
+    (setq exwm-randr-workspace-output-plist '(1 "HDMI-2"))
+    (add-hook 'exwm-randr-screen-change-hook
+	(defun exwm-auto-toggle-screen ()
+	    (with-temp-buffer
+		(call-process "xrandr" nil t nil)
+		(beginning-of-buffer)
+		(if (search-forward "eDP-1 connected" nil 'noerror)
+		    (start-process-shell-command
+			"xrandr" nil "xrandr --output HDMI-2 --off --output HDMI-1 --off --output DP-1 --off --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-2 --off")
+		    (start-process-shell-command
+			"xrandr" nil "xrandr --output HDMI-2 --primary --mode 2560x1440 --pos 0x0 --rotate normal --output HDMI-1 --off --output DP-1 --off --output eDP-1 --off --output DP-2 --off"))))
+	)
+    (exwm-randr-enable)
+    )
+#+END_SRC
+** COMMENT Battery
+#+BEGIN_SRC emacs-lisp
+(use-package fancy-battery
+    :if (package-installed-p 'exwm)
+    :ensure t
+    :config
+    (setq fancy-battery-show-percentage t)
+    (setq battery-update-interval 15)
+    (if window-system
+	(fancy-battery-mode)
+	(display-battery-mode)))
+#+END_SRC
+** COMMENT dmenu
+#+BEGIN_SRC emacs-lisp
+(use-package dmenu
+    :if (package-installed-p 'exwm)
+    :ensure t
+    :bind
+    ("s-d" . 'dmenu))
+#+END_SRC
+** COMMENT System monitor
+#+BEGIN_SRC emacs-lisp
+(use-package symon
+    :if (package-installed-p 'exwm)
+    :ensure t
+    :bind
+    ("s-h" . symon-mode))
+#+END_SRC
+** Default browser
+#+BEGIN_SRC emacs-lisp
+(setq browse-url-browser-function 'browse-url-generic
+    browse-url-generic-program "firefox")
+#+END_SRC
+* PATH
+#+BEGIN_SRC emacs-lisp
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (setq-default exec-path-from-shell-arguments nil)
+    (exec-path-from-shell-initialize)
+    )
+  :ensure t)
+#+END_SRC
+* Async
+#+BEGIN_SRC emacs-lisp
+(use-package async
+  :ensure t
+  :init (dired-async-mode 1))
+#+END_SRC
+* evil
+#+BEGIN_SRC emacs-lisp
+(use-package evil
+    :ensure t
+    :config
+    (evil-mode 1))
+#+END_SRC
+* UI packages
+** SMEX
+   #+BEGIN_SRC emacs-lisp
+(use-package smex
+  :config
+  (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex)
+  :ensure t)
+   #+END_SRC
+
+** Windmove. Navigate frames
+   #+BEGIN_SRC emacs-lisp
+(use-package windmove
+  :config
+  (global-set-key (kbd "C-c <left>")  'windmove-left)
+  (global-set-key (kbd "C-c <right>") 'windmove-right)
+  (global-set-key (kbd "C-c <up>")    'windmove-up)
+  (global-set-key (kbd "C-c <down>")  'windmove-down)
+  :ensure t)
+   #+END_SRC
+** Theme
+   #+BEGIN_SRC emacs-lisp
+(use-package creamsody-theme
+  :ensure t
+  )
+   #+END_SRC
+** Spaceline
+#+BEGIN_SRC emacs-lisp
+(use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (setq spaceline-buffer-encoding-abbrev-p nil)
+    (setq spaceline-line-column-p nil)
+    (setq spaceline-line-p nil)
+    (setq powerline-default-separator (quote arrow))
+    (spaceline-spacemacs-theme)
+    (setq powerline-default-separator nil)) 
+#+END_SRC
+** Swiper
+#+BEGIN_SRC emacs-lisp
+(use-package swiper
+    :ensure t
+    :bind ("C-s" . 'swiper))
+#+END_SRC
+** ivy
+#+BEGIN_SRC emacs-lisp
+(use-package ivy
+    :ensure t)
+#+END_SRC
+** avy
+#+BEGIN_SRC emacs-lisp
+(use-package avy
+    :ensure t
+    :bind
+    ("M-s" . avy-goto-char))
+#+END_SRC
+** Highlight cursor when switching buffers/workspaces
+#+BEGIN_SRC emacs-lisp
+(use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1))
+#+END_SRC
+** Show hex color
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-mode
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook 'rainbow-mode))
+#+END_SRC
+** Color parentheses depending on depth
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+#+END_SRC
+* Editing packages
+** Undo tree
+    #+BEGIN_SRC emacs-lisp
+(use-package undo-tree
+  :ensure t
+  :config
+  (global-undo-tree-mode))
+    #+END_SRC
+
+** Smartparens
+   #+BEGIN_SRC emacs-lisp
+(use-package smartparens
+  :bind (:map smartparens-mode-map
+	      ("C-M-<left>" . sp-backward-sexp)
+	      ("C-M-<right>" . sp-forward-sexp)
+	      ("C-S-<backspace>" . sp-backward-kill-sexp)
+	      ("C-M-<down>" . sp-select-next-thing))
+  :init
+  (setq blink-matching-paren nil)
+  (require 'smartparens-config)
+  (set-face-attribute 'sp-show-pair-match-face nil :foreground "#CCCCCC" :background nil)
+  (set-face-attribute 'sp-show-pair-mismatch-face nil :foreground "red" :background nil)
+  :config
+  (smartparens-global-mode t)
+  (show-smartparens-global-mode t)
+  (sp-local-pair 'c++-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
+
+  (defun my-create-newline-and-enter-sexp (&rest _ignored)
+    "Open a new brace or bracket expression, with relevant newlines and indent. "
+    (newline)
+    (indent-according-to-mode)
+    (forward-line -1)
+    (indent-according-to-mode))
+  :ensure t
+  :diminish smartparens-mode)
+   #+END_SRC
 ** Latex
    #+BEGIN_SRC emacs-lisp
 (use-package tex
@@ -318,50 +419,51 @@
   (setq TeX-PDF-mode t)
   (setq TeX-view-program-selection '((output-pdf "Zathura"))))
    #+END_SRC
-
-* Functions
-** Open .emacs file
-   #+BEGIN_SRC emacs-lisp
-(defvar dot_emacs_file_path (concat user-emacs-directory "emacs-init.org"))
-(defun dotemacsfile ()
-  (interactive)
-  (with-current-buffer (find-file dot_emacs_file_path)))
-   #+END_SRC
-   
+** Treat camelCase as multiple words
+#+BEGIN_SRC emacs-lisp
+(global-subword-mode 1)
+#+END_SRC
+** sudo-edit
+#+BEGIN_SRC emacs-lisp
+(use-package sudo-edit
+    :ensure t
+    :bind
+    ("s-e" . sudo-edit))
+#+END_SRC
 * Programming
 ** Version control
    #+BEGIN_SRC emacs-lisp
 (use-package magit
-  :config
-  (when (eq system-type 'windows-nt)
-    (setenv "GIT_ASKPASS" "git-gui--askpass")
-    (setenv "SSH_ASKPASS" "git-gui--askpass")
-    )
-  (when (eq system-type 'gnu/linux)
-    (exec-path-from-shell-copy-env "SSH_AGENT_PID")
-    (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
-    )
-  (setq magit-diff-refine-hunk t)
-  :ensure t)
+    :config
+    (when (eq system-type 'windows-nt)
+	(setenv "GIT_ASKPASS" "git-gui--askpass")
+	(setenv "SSH_ASKPASS" "git-gui--askpass")
+	)
+    (when (eq system-type 'gnu/linux)
+	(exec-path-from-shell-copy-env "SSH_AGENT_PID")
+	(exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
+	)
+    (setq magit-diff-refine-hunk t)
+    :ensure t)
    #+END_SRC
    
 ** Flycheck
    #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :ensure t
-  :config
-  ;; customize flycheck temp file prefix
-  (setq-default flycheck-temp-prefix ".flycheck"))
+    :ensure t
+    :config
+    ;; customize flycheck temp file prefix
+    (setq-default flycheck-temp-prefix ".flycheck"))
    #+END_SRC
    
 ** Company. Autocompletion
    #+BEGIN_SRC emacs-lisp
 (use-package company
-  :ensure t
-  :defer t
-  :init (add-hook 'after-init-hook 'global-company-mode)
-  :config
-  (setq company-idle-delay                0.5
+    :ensure t
+    :defer t
+    :init (add-hook 'after-init-hook 'global-company-mode)
+    :config
+    (setq company-idle-delay                0.5
 	company-minimum-prefix-length     2
 	company-tooltip-limit             20
 	company-tooltip-align-annotations t
@@ -371,39 +473,13 @@
 ** Projectile
    #+BEGIN_SRC emacs-lisp
 (use-package projectile
-  :ensure t
-  :commands (projectile-global-mode projectile-ignored-projects projectile-compile-project)
-  :init
-  (projectile-global-mode)
-  (global-set-key (kbd "<f5>") 'projectile-compile-project)
-  :config
-  (setq projectile-completion-system 'helm)
-  (setq projectile-switch-project-action 'helm-projectile)
-  (setq projectile-indexing-method 'alien))
-(global-set-key (kbd "<f6>") 'next-error)
+    :ensure t
+    :commands (projectile-global-mode projectile-ignored-projects projectile-compile-project)
+    :init
+    (projectile-global-mode)
+    (global-set-key (kbd "<f5>") 'projectile-compile-project)
+    (global-set-key (kbd "<f6>") 'next-error))
    #+END_SRC
-** Helm with ripgrep
-   #+BEGIN_SRC emacs-lisp
-(use-package helm
-  :config
-  (helm-mode 1)
-  (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  :ensure t)
-
-(use-package helm-ag
-  :if (package-installed-p 'helm)
-  :config
-  (setq helm-ag-base-command "rg --color=never --smart-case --no-heading --line-number")
-  :ensure t)
-
-(use-package helm-projectile
-  :if (and (package-installed-p 'helm-ag) (package-installed-p 'projectile))
-  :config
-  (setq projectile-switch-project-action 'helm-projectile-find-file)
-  (global-set-key (kbd "C-x ,") 'helm-ag-project-root)
-  :ensure t)
-   #+END_SRC
-
 ** Rust
 *** Rust-Mode
     #+BEGIN_SRC emacs-lisp
@@ -411,82 +487,7 @@
     :mode "\\.rs\\'"
     :init
     (setq rust-format-on-save t))
-
-;(use-package lsp-mode
-;    :config
-;    (add-hook 'rust-mode-hook 'lsp-mode)
-;    (use-package lsp-flycheck
-;        :ensure f ; comes with lsp-mode
-;        :after flycheck))
-
-;(use-package lsp-rust
-;    :init
-;    (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
-;    :config
-;    (add-hook 'rust-mode-hook #'lsp-rust-enable)
-;    (add-hook 'rust-mode-hook #'flycheck-mode)
-;    :after lsp-mode)
-
-;(use-package company-lsp
-;    :ensure t
-;    :config
-;    (push 'company-lsp company-backends)
-;    :after lsp-mode
-;    )
     #+END_SRC
-    
-** C/C++
-*** Flycheck-pkg-config
-    #+BEGIN_SRC emacs-lisp
-(use-package flycheck-pkg-config
-  :if (package-installed-p 'flycheck)
-  :ensure t)
-    #+END_SRC
-    
-*** Flycheck C/C++ settings
-    #+BEGIN_SRC emacs-lisp
-(defun flycheck_settings()
-  (setq flycheck-clang-language-standard "c++17"))
-(add-hook 'c++-mode-hook 'flycheck_settings)
-    #+END_SRC
-    
-*** Hooks
-    #+BEGIN_SRC emacs-lisp
-(defun kill-line_kbd()
-  (define-key c-mode-map "\C-d" 'kill-whole-line)
-  (define-key c++-mode-map "\C-d" 'kill-whole-line))
-(defun c-hooks()
-  (kill-line_kbd))
-(add-hook 'c-mode-hook 'c-hooks)
-(add-hook 'c++-mode-hook 'c-hooks)
-    #+END_SRC
-    
-*** Company-C
-    #+BEGIN_SRC emacs-lisp
-(use-package company-c-headers
-  :if (package-installed-p 'company)
-  :ensure t
-  :config
-  (add-to-list 'company-backends 'company-c-headers)
-  (if (eq system-type 'gnu/linux)
-      (lambda()
-        (add-to-list 'company-c-headers-path-system "/usr/include/c++/7.2.0")))
-  )
-    #+END_SRC
-
-*** Tags
-#+BEGIN_SRC emacs-lisp
-(use-package dumb-jump
-  :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go)
-         ("M-g i" . dumb-jump-go-prompt)
-         ("M-g x" . dumb-jump-go-prefer-external)
-         ("M-g z" . dumb-jump-go-prefer-external-other-window))
-  :config
-(setq dumb-jump-selector 'helm)
-(setq dumb-jump-force-searcher 'rg)
-  :ensure)
-#+END_SRC
     
 ** Webdev
 *** Web-mode
