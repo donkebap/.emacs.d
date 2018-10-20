@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
     '(package-selected-packages
 	 (quote
-	     (sudo-edit rainbow-delimiters rainbow-mode beacon avy swiper yaml-mode web-mode use-package tide symon spaceline smex smartparens magit json-mode js2-mode ivy helm-projectile helm-ag flycheck-pkg-config fancy-battery exwm expand-region exec-path-from-shell evil dumb-jump drag-stuff dmenu creamsody-theme company-lsp company-c-headers auctex))))
+	     (counsel-projectile yaml-mode use-package swiper sudo-edit spaceline smex smartparens rainbow-mode rainbow-delimiters projectile magit lsp-rust flycheck-rust exec-path-from-shell evil creamsody-theme company beacon avy auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
